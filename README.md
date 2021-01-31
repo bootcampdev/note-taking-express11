@@ -53,13 +53,21 @@ DELETE /api/notes/:id - Should receive a query parameter containing the id of a 
 ## Installation Requirements
 
 $ node install inquirer
+
+
 $ node install express
+
 $ node install uuid
+
+
 
 
 ## Usage
 ```md
-Heroku
+Deployment is using Heroku for our public server
+
+https://fast-lowlands-81468.herokuapp.com/
+
 ```
 
 
