@@ -2,10 +2,13 @@
 // could use a random number generator but I thought I'd try uuid
 
 const { uuid } = require("uuidv4");
+
 const path = require("path");
 const fs = require("fs");
 const express = require("express");
 const { json } = require("express");
+const { v4 } = require("uuid");
+
 
 const app = express();
 
@@ -20,9 +23,9 @@ const PORT = process.env.PORT || 3001;
 const html_path = path.join(__dirname, "./public");
 const db_file = path.join(__dirname, "./db/db.json");
 
-console.log("html path: ", html_path);
-console.log("db path: ", db_file);
-console.log(path.join(__dirname, "/index.html"));
+// console.log("html path: ", html_path);
+// console.log("db path: ", db_file);
+// console.log(path.join(__dirname, "/index.html"));
 
 //
 // middleware
@@ -32,30 +35,19 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "assets/js")))
 app.use(express.static(__dirname + '/public'));
 
-console.log("where is js: ",path.join(__dirname, "public/assets/js"));
-
-//
-
-// const myNotes = [
-//     {
-//         id: "1",
-//         title: "title1",
-//         text: "text1"
-//     }
-// ];
 
 //
 // html routes to serve html pages
 
 app.get("/", (req, res) => {
-    console.log(req.url);
+   
     //res.send('success');
     res.sendFile(path.join(html_path, "/index.html"));
 })
 
 
 app.get("/notes", (req, res) => {
-    console.log(req.url);
+   
     //res.send('success');
     res.sendFile(path.join(html_path, "/notes.html"));
 })
@@ -112,7 +104,7 @@ app.get("/api/notes", (req, res) => {
         // console.log("after push myNotes: ", myNotes);
         //#endregion
 
-        console.log("IN GET param id read: ", req.params.id);
+        //console.log("IN GET param id read: ", req.params.id);
         
         var notes = read_all_notes(db_file);
         
@@ -132,9 +124,8 @@ app.get("/api/notes", (req, res) => {
 app.post("/api/notes", (req, res) => {
 
     const newNote = req.body;
-    newNote.id = uuid();
-    console.log("in POST ",newNote);
-
+    newNote.id = v4();
+    
     const myNotes = read_all_notes(db_file);
 
     myNotes.push(newNote);
@@ -146,17 +137,15 @@ app.post("/api/notes", (req, res) => {
         }
     })
 
-    //console.log(myNotes);
     res.status(200).send();
 })
 
 //
-// delete a note by id
+// delete a note by it's id
 
 app.delete("/api/notes/:id", (req,res) => {
     
-    const note_id = req.params.id
-    console.log("In DELETE set to id ", note_id);
+    const note_id = req.params.id    
 
     const notes = read_all_notes(db_file);
     
@@ -174,7 +163,7 @@ app.delete("/api/notes/:id", (req,res) => {
 
     notes.splice(index, 1);
 
-    // resave notes to the db json file 
+    // re-save notes to the db json file 
 
     fs.writeFile(db_file, JSON.stringify(notes), (err) => {
         if (err) {
@@ -183,13 +172,7 @@ app.delete("/api/notes/:id", (req,res) => {
         }
     })
 
-    //console.log(myNotes);
     res.status(200).send();
-
-    //console.log("In DELETE index: ", index);
-    
-    //console.log("In DELETE after delete notes ", notes);
-
 
 })
 
@@ -202,15 +185,7 @@ function read_all_notes(file_name) {
         const data = fs.readFileSync(file_name, { encoding: "ascii", flag: "r" });
 
         var notes = JSON.parse(data);
-
-        // notes.forEach(element => {
-        //     console.log(element.id);
-        //     console.log(element.title);
-        //     console.log(element.text);
-
-        //     // element.id = uuid();
-        //     // myNotes.push(element);
-        // })
+ 
     } catch (err) {
         console.error(err);
     }
