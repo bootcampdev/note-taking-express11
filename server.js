@@ -53,10 +53,6 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(html_path, "/index.html"));
 })
 
-// app.get("assets/js/index.js", function (req, res) {
-//     res.sendFile(path.join(__dirname, "assets/js/", "index.js"));
-//   });
-
 
 app.get("/notes", (req, res) => {
     console.log(req.url);
@@ -116,6 +112,8 @@ app.get("/api/notes", (req, res) => {
         // console.log("after push myNotes: ", myNotes);
         //#endregion
 
+        console.log("IN GET param id read: ", req.params.id);
+        
         var notes = read_all_notes(db_file);
         
         res.json(notes);
@@ -124,7 +122,7 @@ app.get("/api/notes", (req, res) => {
         console.error(err);
     }
 
-    console.log("before return Notes: ", notes);
+    //console.log("before return Notes: ", notes);
 })
 
 
@@ -135,7 +133,7 @@ app.post("/api/notes", (req, res) => {
 
     const newNote = req.body;
     newNote.id = uuid();
-    console.log(newNote);
+    console.log("in POST ",newNote);
 
     const myNotes = read_all_notes(db_file);
 
@@ -148,7 +146,7 @@ app.post("/api/notes", (req, res) => {
         }
     })
 
-    console.log(myNotes);
+    //console.log(myNotes);
     res.status(200).send();
 })
 
@@ -157,13 +155,42 @@ app.post("/api/notes", (req, res) => {
 
 app.delete("/api/notes/:id", (req,res) => {
     
-    console.log("param id read: ", req.params.id);
     const note_id = req.params.id
-    console.log("set to id ", note_id);
+    console.log("In DELETE set to id ", note_id);
 
-    var notes = read_all_notes(db_file);
-        
-    res.json(notes);
+    const notes = read_all_notes(db_file);
+    
+    //
+    // find index of item to delete then splice it out
+
+    let index = 0;
+    notes.every(element => {
+        if (element.id == note_id)
+            return false;            
+        else
+            index++;    
+        return true;                    
+    });
+
+    notes.splice(index, 1);
+
+    // resave notes to the db json file 
+
+    fs.writeFile(db_file, JSON.stringify(notes), (err) => {
+        if (err) {
+            console.log(err);
+            res.status(500).send();
+        }
+    })
+
+    //console.log(myNotes);
+    res.status(200).send();
+
+    //console.log("In DELETE index: ", index);
+    
+    //console.log("In DELETE after delete notes ", notes);
+
+
 })
 
 
@@ -176,14 +203,14 @@ function read_all_notes(file_name) {
 
         var notes = JSON.parse(data);
 
-        notes.forEach(element => {
-            console.log(element.id);
-            console.log(element.title);
-            console.log(element.text);
+        // notes.forEach(element => {
+        //     console.log(element.id);
+        //     console.log(element.title);
+        //     console.log(element.text);
 
-            // element.id = uuid();
-            // myNotes.push(element);
-        })
+        //     // element.id = uuid();
+        //     // myNotes.push(element);
+        // })
     } catch (err) {
         console.error(err);
     }
