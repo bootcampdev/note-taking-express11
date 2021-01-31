@@ -17,8 +17,8 @@ const PORT = process.env.PORT || 3001;
 //
 // define some known paths
 
-const html_path = path.join(__dirname, "../develop/public");
-const db_file = path.join(__dirname, "../develop/db/db.json");
+const html_path = path.join(__dirname, "./public");
+const db_file = path.join(__dirname, "./db/db.json");
 
 console.log("html path: ", html_path);
 console.log("db path: ", db_file);
@@ -29,6 +29,10 @@ console.log(path.join(__dirname, "/index.html"));
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "assets/js")))
+app.use(express.static(__dirname + '/public'));
+
+console.log("where is js: ",path.join(__dirname, "public/assets/js"));
 
 //
 
@@ -48,6 +52,11 @@ app.get("/", (req, res) => {
     //res.send('success');
     res.sendFile(path.join(html_path, "/index.html"));
 })
+
+// app.get("assets/js/index.js", function (req, res) {
+//     res.sendFile(path.join(__dirname, "assets/js/", "index.js"));
+//   });
+
 
 app.get("/notes", (req, res) => {
     console.log(req.url);
